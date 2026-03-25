@@ -1,55 +1,67 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon },
   { to: '/timesheets', label: 'Timesheets', icon: TimesheetIcon },
   { to: '/rates', label: 'Rates', icon: RatesIcon },
-  { to: '/payroll', label: 'Payroll Export', icon: PayrollIcon },
-  { to: '/quantities', label: 'Invoice History', icon: QuantitiesIcon },
-  { to: '/invoices', label: 'Generate Invoice', icon: InvoiceIcon },
+  { to: '/payroll', label: 'Payroll', icon: PayrollIcon },
+  { to: '/quantities', label: 'Quantities', icon: QuantitiesIcon },
+  { to: '/invoices', label: 'Invoices', icon: InvoiceIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ]
 
+const breadcrumbMap = {
+  '/': 'Dashboard',
+  '/timesheets': 'Timesheets',
+  '/rates': 'Rates & Contracts',
+  '/payroll': 'Payroll Export',
+  '/quantities': 'Invoice History',
+  '/invoices': 'Generate Invoice',
+  '/settings': 'Settings',
+}
+
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false)
+  const location = useLocation()
+  const currentPage = breadcrumbMap[location.pathname] || 'Contractor Suite'
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-surface-950">
       {/* Sidebar */}
       <aside
         className={`${
-          collapsed ? 'w-16' : 'w-56'
-        } bg-surface-900 border-r border-surface-700/50 flex flex-col transition-all duration-200 shrink-0`}
+          collapsed ? 'w-16' : 'w-[220px]'
+        } bg-surface-900 border-r border-surface-800 flex flex-col transition-all duration-200 shrink-0`}
       >
         {/* Logo */}
-        <div className="h-14 flex items-center px-4 border-b border-surface-700/50 gap-3">
-          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+        <div className="h-12 flex items-center px-3 border-b border-surface-800 gap-2.5">
+          <div className="w-8 h-8 rounded-[3px] bg-brand-600 flex items-center justify-center text-white font-bold text-[13px] shrink-0 tracking-tight">
             CS
           </div>
           {!collapsed && (
-            <span className="font-semibold text-surface-100 text-sm whitespace-nowrap">
+            <span className="font-semibold text-surface-100 text-[13px] whitespace-nowrap tracking-tight">
               Contractor Suite
             </span>
           )}
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 py-2 px-2 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === '/'}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                `flex items-center gap-2.5 px-2.5 py-2 rounded-[3px] text-[13px] transition-all relative ${
                   isActive
-                    ? 'bg-brand-600/20 text-brand-400 font-medium'
-                    : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800'
+                    ? 'bg-brand-600/10 text-brand-400 font-medium before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:bg-brand-500 before:rounded-r-full'
+                    : 'text-surface-500 hover:text-surface-300 hover:bg-surface-800/60'
                 }`
               }
             >
-              <item.icon className="w-5 h-5 shrink-0" />
+              <item.icon className="w-[18px] h-[18px] shrink-0" />
               {!collapsed && <span>{item.label}</span>}
             </NavLink>
           ))}
@@ -58,23 +70,44 @@ export default function Layout() {
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="h-10 flex items-center justify-center border-t border-surface-700/50 text-surface-500 hover:text-surface-300 transition-colors"
+          className="h-10 flex items-center justify-center border-t border-surface-800 text-surface-600 hover:text-surface-400 transition-colors"
         >
           <svg className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
           </svg>
         </button>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <header className="h-12 flex items-center justify-between px-5 border-b border-surface-800 bg-surface-950 shrink-0">
+          <div className="flex items-center gap-2 text-[13px]">
+            <span className="text-surface-600">Contractor Suite</span>
+            <svg className="w-3.5 h-3.5 text-surface-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="text-surface-200 font-medium">{currentPage}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-surface-800 border border-surface-700 flex items-center justify-center">
+              <svg className="w-3.5 h-3.5 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }
 
-// Inline SVG icon components
+// Inline SVG icon components — thinner strokes for premium feel
 function DashboardIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">

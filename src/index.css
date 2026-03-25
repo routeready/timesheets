@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
   --color-brand-50: #eff6ff;
   --color-brand-100: #dbeafe;
   --color-brand-200: #bfdbfe;
@@ -13,19 +15,20 @@
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
 
-  --color-surface-50: #f8fafc;
-  --color-surface-100: #f1f5f9;
-  --color-surface-200: #e2e8f0;
-  --color-surface-300: #cbd5e1;
-  --color-surface-400: #94a3b8;
-  --color-surface-500: #64748b;
-  --color-surface-600: #475569;
-  --color-surface-700: #334155;
-  --color-surface-800: #1e293b;
-  --color-surface-900: #0f172a;
-  --color-surface-950: #020617;
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f4f4f5;
+  --color-surface-200: #e4e4e7;
+  --color-surface-300: #d4d4d8;
+  --color-surface-400: #a1a1aa;
+  --color-surface-500: #71717a;
+  --color-surface-600: #52525b;
+  --color-surface-700: #3f3f46;
+  --color-surface-800: #27272a;
+  --color-surface-850: #1e1e22;
+  --color-surface-900: #18181b;
+  --color-surface-950: #0a0a0f;
 
-  --color-contract: #3b82f6;
+  --color-contract: #2563eb;
   --color-extra-work: #f59e0b;
   --color-standby: #8b5cf6;
   --color-company: #10b981;
@@ -33,30 +36,39 @@
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
+
+  --color-accent: #2563eb;
 }
 
 body {
-  @apply bg-surface-950 text-surface-100 min-h-screen;
+  @apply bg-surface-950 text-surface-300 min-h-screen font-sans;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-surface-900;
+  @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-surface-600 rounded-full;
+  @apply bg-surface-700 rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-surface-500;
+  @apply bg-surface-600;
 }
 
 /* Table cell inputs */
 .cell-input {
-  @apply w-full bg-transparent text-center text-sm border-0 outline-none focus:ring-2 focus:ring-brand-500 rounded px-1 py-1.5;
+  @apply w-full bg-transparent text-center text-[13px] border-0 outline-none rounded-sm px-1 py-1.5 text-surface-300;
+  transition: background-color 0.1s, box-shadow 0.1s;
+}
+.cell-input:focus {
+  @apply bg-surface-800 ring-1 ring-brand-600;
 }
 .cell-input::-webkit-inner-spin-button,
 .cell-input::-webkit-outer-spin-button {
@@ -69,19 +81,41 @@ body {
 
 /* Button styles */
 .btn-primary {
-  @apply px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg font-medium transition-colors;
+  @apply px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-[3px] font-medium text-[13px] transition-all;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.btn-primary:active {
+  @apply bg-brand-700;
 }
 .btn-secondary {
-  @apply px-4 py-2 bg-surface-800 hover:bg-surface-700 text-surface-300 rounded-lg font-medium border border-surface-700 transition-colors;
+  @apply px-4 py-2 bg-surface-850 hover:bg-surface-800 text-surface-300 rounded-[3px] font-medium text-[13px] border border-surface-700 transition-all;
+}
+.btn-secondary:active {
+  @apply bg-surface-900;
 }
 
 /* Input styles */
 .input-field {
-  @apply w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-200 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors;
+  @apply w-full bg-surface-900 border border-surface-700 rounded-[3px] px-3 py-2 text-[13px] text-surface-200 placeholder-surface-600 focus:outline-none focus:ring-1 focus:ring-brand-600 focus:border-brand-600 transition-all;
 }
 
 /* Animation */
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Dense table rows */
+.table-dense tr {
+  @apply border-b border-surface-800/50;
+}
+.table-dense th {
+  @apply text-[11px] font-semibold text-surface-500 uppercase tracking-wider;
+}
+.table-dense td {
+  @apply text-[13px] text-surface-300;
 }

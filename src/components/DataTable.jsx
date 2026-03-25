@@ -54,7 +54,7 @@ export default function DataTable({
     }
   }
 
-  const cellPadding = compact ? 'px-3 py-1.5' : 'px-4 py-2.5'
+  const cellPadding = compact ? 'px-3 py-1.5' : 'px-4 py-2'
 
   return (
     <div>
@@ -66,21 +66,21 @@ export default function DataTable({
             placeholder="Filter..."
             value={filter}
             onChange={(e) => { setFilter(e.target.value); setPage(0) }}
-            className="bg-surface-800 border border-surface-700 rounded-lg px-3 py-1.5 text-sm text-surface-200 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500 w-64"
+            className="bg-surface-900 border border-surface-800 rounded-[3px] px-3 py-1.5 text-[13px] text-surface-300 placeholder-surface-600 focus:outline-none focus:ring-1 focus:ring-brand-600 w-56"
           />
         </div>
       )}
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-surface-700/50">
+            <tr className="border-b border-surface-800">
               {columns.map((col) => (
                 <th
                   key={col.id || col.accessor}
                   onClick={() => handleSort(col.id || col.accessor)}
-                  className={`${cellPadding} text-left text-xs font-medium text-surface-400 uppercase tracking-wider cursor-pointer hover:text-surface-200 select-none ${col.className || ''}`}
+                  className={`${cellPadding} text-left text-[11px] font-semibold text-surface-500 uppercase tracking-wider cursor-pointer hover:text-surface-300 select-none ${col.className || ''}`}
                 >
                   <span className="flex items-center gap-1">
                     {col.header}
@@ -92,10 +92,10 @@ export default function DataTable({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-800/50">
+          <tbody>
             {pageData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-8 text-center text-surface-500">
+                <td colSpan={columns.length} className="px-4 py-8 text-center text-surface-600 text-[13px]">
                   {emptyMessage}
                 </td>
               </tr>
@@ -104,12 +104,12 @@ export default function DataTable({
                 <tr
                   key={row.id || idx}
                   onClick={() => onRowClick?.(row)}
-                  className={`hover:bg-surface-800/50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`border-b border-surface-800/40 hover:bg-surface-800/30 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                 >
                   {columns.map((col) => {
                     const val = typeof col.accessor === 'function' ? col.accessor(row) : row[col.accessor]
                     return (
-                      <td key={col.id || col.accessor} className={`${cellPadding} text-surface-200 ${col.className || ''}`}>
+                      <td key={col.id || col.accessor} className={`${cellPadding} text-surface-300 ${col.className || ''}`}>
                         {col.cell ? col.cell(val, row) : val}
                       </td>
                     )
@@ -123,25 +123,25 @@ export default function DataTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-surface-800">
-          <span className="text-xs text-surface-500">
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-surface-800">
+          <span className="text-[11px] text-surface-600">
             {sorted.length} results {filter && `(filtered from ${data.length})`}
           </span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="px-2 py-1 text-xs rounded bg-surface-800 text-surface-400 hover:text-surface-200 disabled:opacity-30"
+              className="px-2 py-1 text-[11px] rounded-[2px] bg-surface-850 text-surface-500 hover:text-surface-300 disabled:opacity-30 border border-surface-800"
             >
               Prev
             </button>
-            <span className="text-xs text-surface-400 px-2">
+            <span className="text-[11px] text-surface-500 px-2">
               {page + 1} / {totalPages}
             </span>
             <button
               onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1}
-              className="px-2 py-1 text-xs rounded bg-surface-800 text-surface-400 hover:text-surface-200 disabled:opacity-30"
+              className="px-2 py-1 text-[11px] rounded-[2px] bg-surface-850 text-surface-500 hover:text-surface-300 disabled:opacity-30 border border-surface-800"
             >
               Next
             </button>

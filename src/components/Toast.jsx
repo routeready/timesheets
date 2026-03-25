@@ -30,12 +30,12 @@ export function ToastProvider({ children }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-[slideIn_0.2s_ease-out] ${
+            className={`px-4 py-2.5 rounded-[3px] text-[13px] font-medium animate-[slideIn_0.2s_ease-out] border ${
               t.type === 'success'
-                ? 'bg-emerald-600/90 text-white'
+                ? 'bg-emerald-950/90 text-emerald-400 border-emerald-800/50'
                 : t.type === 'error'
-                ? 'bg-red-600/90 text-white'
-                : 'bg-brand-600/90 text-white'
+                ? 'bg-red-950/90 text-red-400 border-red-800/50'
+                : 'bg-brand-950/90 text-brand-400 border-brand-800/50'
             }`}
           >
             {t.message}
