@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { useLocalStorage } from '../../lib/hooks'
 import { STORAGE_KEYS, DEFAULT_COMPANY_SETTINGS } from '../../lib/constants'
 import { getStorageUsage } from '../../lib/storage'
+import { loadSampleData } from '../../data/seedLoader'
 
 export default function SettingsPage() {
   const toast = useToast()
@@ -225,6 +226,22 @@ export default function SettingsPage() {
                     Import Backup
                     <input type="file" accept=".json" onChange={handleImportBackup} className="hidden" />
                   </label>
+                </div>
+              </Section>
+
+              <Section title="Sample Data">
+                <div className="space-y-2">
+                  <p className="text-xs text-surface-500">Load demo employees, contracts, and timesheets to explore the app.</p>
+                  <button
+                    onClick={() => {
+                      if (!confirm('This will overwrite existing employees, contracts, timesheets, and company settings. Continue?')) return
+                      const counts = loadSampleData()
+                      toast.success(`Loaded ${counts.employees} employees, ${counts.contracts} contracts, ${counts.timesheets} timesheets (${counts.timesheetRows} rows). Refresh the page.`)
+                    }}
+                    className="btn-secondary text-xs"
+                  >
+                    Load Sample Data
+                  </button>
                 </div>
               </Section>
 
