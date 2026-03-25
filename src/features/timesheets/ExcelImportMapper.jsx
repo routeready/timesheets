@@ -19,7 +19,6 @@ const MAPPABLE_FIELDS = [
 export default function ExcelImportMapper({ data, onConfirm, onCancel }) {
   const { headers, rows } = data
 
-  // Auto-detect column mappings
   const [mapping, setMapping] = useState(() => {
     const m = {}
     MAPPABLE_FIELDS.forEach(field => {
@@ -79,21 +78,21 @@ export default function ExcelImportMapper({ data, onConfirm, onCancel }) {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-surface-400">
-        Map your Excel columns to timesheet fields. {rows.length} data rows found.
+      <p className="text-[13px] text-surface-500">
+        Map your Excel columns to timesheet fields. <span className="text-surface-300 font-medium">{rows.length}</span> data rows found.
       </p>
 
       {/* Column mapping */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5">
         {MAPPABLE_FIELDS.map(field => (
           <div key={field.key} className="flex items-center gap-2">
-            <label className="text-xs text-surface-400 w-32 shrink-0">
+            <label className="text-[11px] text-surface-500 w-28 shrink-0 font-medium">
               {field.label} {field.required && <span className="text-red-400">*</span>}
             </label>
             <select
               value={mapping[field.key] ?? ''}
               onChange={(e) => setFieldMapping(field.key, e.target.value)}
-              className="input-field text-xs flex-1"
+              className="input-field text-[12px] flex-1"
             >
               <option value="">-- Skip --</option>
               {headers.map((h, i) => (
@@ -106,13 +105,13 @@ export default function ExcelImportMapper({ data, onConfirm, onCancel }) {
 
       {/* Preview */}
       <div>
-        <h4 className="text-xs font-medium text-surface-400 mb-2">Preview (first 5 rows)</h4>
-        <div className="overflow-x-auto rounded-lg border border-surface-700">
-          <table className="w-full text-xs">
+        <h4 className="text-[11px] font-semibold text-surface-500 uppercase tracking-wider mb-2">Preview (first 5 rows)</h4>
+        <div className="overflow-x-auto rounded-[3px] border border-surface-800">
+          <table className="w-full text-[12px]">
             <thead>
-              <tr className="bg-surface-800">
+              <tr className="bg-surface-850">
                 {headers.map((h, i) => (
-                  <th key={i} className="px-2 py-1.5 text-left text-surface-400 font-medium whitespace-nowrap">
+                  <th key={i} className="px-2 py-1.5 text-left text-surface-500 font-medium whitespace-nowrap text-[11px]">
                     {h}
                   </th>
                 ))}
@@ -120,9 +119,9 @@ export default function ExcelImportMapper({ data, onConfirm, onCancel }) {
             </thead>
             <tbody>
               {previewRows.map((row, i) => (
-                <tr key={i} className="border-t border-surface-800">
+                <tr key={i} className="border-t border-surface-800/50">
                   {headers.map((_, j) => (
-                    <td key={j} className="px-2 py-1 text-surface-300 whitespace-nowrap">
+                    <td key={j} className="px-2 py-1 text-surface-400 whitespace-nowrap">
                       {row[j] ?? ''}
                     </td>
                   ))}
@@ -134,11 +133,11 @@ export default function ExcelImportMapper({ data, onConfirm, onCancel }) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <button onClick={onCancel} className="btn-secondary text-sm">Cancel</button>
+        <button onClick={onCancel} className="btn-secondary">Cancel</button>
         <button
           onClick={handleConfirm}
           disabled={mapping.name == null}
-          className="btn-primary text-sm disabled:opacity-40"
+          className="btn-primary disabled:opacity-40"
         >
           Import {rows.filter(r => r[mapping.name]).length} Rows
         </button>

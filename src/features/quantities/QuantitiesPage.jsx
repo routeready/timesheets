@@ -1,30 +1,24 @@
 import { useState, useMemo } from 'react'
 import PageHeader from '../../components/PageHeader'
 import DataTable from '../../components/DataTable'
-import Modal from '../../components/Modal'
 import { useToast } from '../../components/Toast'
 import { useLocalStorage } from '../../lib/hooks'
-import { STORAGE_KEYS, UNITS } from '../../lib/constants'
-import { generateId, formatDateISO } from '../../lib/dates'
+import { STORAGE_KEYS } from '../../lib/constants'
 import { exportToExcel } from '../../lib/excel'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 export default function QuantitiesPage() {
   const toast = useToast()
   const [contracts] = useLocalStorage(STORAGE_KEYS.CONTRACTS, [])
   const [invoices] = useLocalStorage(STORAGE_KEYS.INVOICES, [])
-  const [showEntry, setShowEntry] = useState(false)
-  const [editingInvoice, setEditingInvoice] = useState(null)
   const [filterContract, setFilterContract] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
 
-  // Build billable quantities history from invoices
   const historyData = useMemo(() => {
     let filtered = invoices
     if (filterContract) filtered = filtered.filter(inv => inv.contractNo === filterContract)
     if (filterStatus) filtered = filtered.filter(inv => inv.status === filterStatus)
 
-    // Flatten all line items with invoice context
     return filtered.flatMap(inv =>
       (inv.lineItems || []).map(li => ({
         invoiceNo: inv.invoiceNo,
@@ -46,7 +40,6 @@ export default function QuantitiesPage() {
     )
   }, [invoices, filterContract, filterStatus])
 
-  // Summary by cost code for chart
   const chartData = useMemo(() => {
     const byCode = {}
     historyData.forEach(item => {
@@ -59,7 +52,6 @@ export default function QuantitiesPage() {
     return Object.values(byCode).slice(0, 15)
   }, [historyData])
 
-  // Running totals by contract + cost code
   const runningTotals = useMemo(() => {
     const totals = {}
     invoices
@@ -98,34 +90,34 @@ export default function QuantitiesPage() {
   }
 
   const columns = [
-    { header: 'Contract', accessor: 'contractNo' },
+    { header: 'Contract', accessor: 'contractNo', cell: v => <span className="font-medium text-surface-200">{v}</span> },
     { header: 'Cost Code', accessor: 'costCode' },
     { header: 'Description', accessor: 'description' },
     { header: 'Unit', accessor: 'unit' },
-    { header: 'To-Date Qty', accessor: 'toDateQty', cell: v => v.toFixed(2), className: 'text-right' },
-    { header: 'Unit Rate', accessor: 'unitRate', cell: v => `$${v.toFixed(2)}`, className: 'text-right' },
-    { header: 'To-Date Amount', accessor: 'toDateAmount', cell: v => <span className="font-semibold">${v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'To-Date Qty', accessor: 'toDateQty', cell: v => <span className="tabular-nums">{v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'Rate', accessor: 'unitRate', cell: v => <span className="tabular-nums">${v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'To-Date $', accessor: 'toDateAmount', cell: v => <span className="font-semibold text-brand-400 tabular-nums">${v.toFixed(2)}</span>, className: 'text-right' },
   ]
 
   const detailColumns = [
-    { header: 'Invoice #', accessor: 'invoiceNo' },
-    { header: 'Period', accessor: row => `${row.periodStart || ''} - ${row.periodEnd || ''}`, id: 'period' },
+    { header: 'Invoice', accessor: 'invoiceNo', cell: v => <span className="font-medium text-surface-200">{v}</span> },
+    { header: 'Period', accessor: row => `${row.periodStart || ''} — ${row.periodEnd || ''}`, id: 'period' },
     { header: 'Contract', accessor: 'contractNo' },
     { header: 'Cost Code', accessor: 'costCode' },
     { header: 'Description', accessor: 'description' },
-    { header: 'Prev Qty', accessor: 'previousQty', cell: v => v.toFixed(2), className: 'text-right' },
-    { header: 'This Period', accessor: 'thisQty', cell: v => v.toFixed(2), className: 'text-right' },
-    { header: 'To-Date', accessor: 'toDateQty', cell: v => v.toFixed(2), className: 'text-right' },
-    { header: 'Rate', accessor: 'unitRate', cell: v => `$${v.toFixed(2)}`, className: 'text-right' },
-    { header: 'This Amt', accessor: 'thisAmount', cell: v => `$${v.toFixed(2)}`, className: 'text-right' },
+    { header: 'Prev Qty', accessor: 'previousQty', cell: v => <span className="tabular-nums">{v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'This Period', accessor: 'thisQty', cell: v => <span className="tabular-nums font-medium text-surface-200">{v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'To-Date', accessor: 'toDateQty', cell: v => <span className="tabular-nums">{v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'Rate', accessor: 'unitRate', cell: v => <span className="tabular-nums">${v.toFixed(2)}</span>, className: 'text-right' },
+    { header: 'Amount', accessor: 'thisAmount', cell: v => <span className="tabular-nums">${v.toFixed(2)}</span>, className: 'text-right' },
     {
       header: 'Status',
       accessor: 'status',
       cell: v => (
-        <span className={`text-xs px-2 py-0.5 rounded-full ${
-          v === 'paid' ? 'bg-emerald-600/20 text-emerald-400' :
-          v === 'sent' ? 'bg-blue-600/20 text-blue-400' :
-          'bg-amber-600/20 text-amber-400'
+        <span className={`text-[10px] px-1.5 py-0.5 rounded-[2px] font-semibold border ${
+          v === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+          v === 'sent' ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' :
+          'bg-amber-500/10 text-amber-400 border-amber-500/20'
         }`}>{v || 'draft'}</span>
       ),
     },
@@ -136,56 +128,65 @@ export default function QuantitiesPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader title="Invoice History" subtitle="Billable quantities tracking and history">
-        <button onClick={handleExport} className="btn-secondary text-xs">Export Excel</button>
+      <PageHeader title="Invoice History" subtitle="Billable quantities tracking">
+        <button onClick={handleExport} className="btn-secondary text-[12px]">Export Excel</button>
       </PageHeader>
 
-      {/* Filters */}
-      <div className="px-6 py-3 border-b border-surface-800 flex items-center gap-4">
-        <select value={filterContract} onChange={e => setFilterContract(e.target.value)} className="input-field text-sm w-48">
+      {/* Filter bar */}
+      <div className="px-5 py-2.5 border-b border-surface-800 flex items-center gap-3 bg-surface-950">
+        <select value={filterContract} onChange={e => setFilterContract(e.target.value)} className="input-field w-44">
           <option value="">All Contracts</option>
           {uniqueContracts.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="input-field text-sm w-36">
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="input-field w-32">
           <option value="">All Statuses</option>
           <option value="draft">Draft</option>
           <option value="sent">Sent</option>
           <option value="paid">Paid</option>
         </select>
-        <div className="ml-auto text-sm font-bold text-surface-200">
-          Total: ${grandTotal.toLocaleString('en-CA', { minimumFractionDigits: 2 })}
+        <div className="ml-auto text-[13px]">
+          <span className="text-surface-500">Total:</span>{' '}
+          <span className="font-bold text-surface-100 tabular-nums">${grandTotal.toLocaleString('en-CA', { minimumFractionDigits: 2 })}</span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-5 space-y-4">
         {/* Chart */}
         {chartData.length > 0 && (
-          <div className="bg-surface-900 border border-surface-800 rounded-xl p-5">
-            <h3 className="text-sm font-medium text-surface-400 mb-4">Quantities by Cost Code</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="costCode" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
-                <Bar dataKey="totalAmount" name="Amount ($)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="bg-surface-900 border border-surface-800 rounded-[4px]">
+            <div className="px-4 py-3 border-b border-surface-800">
+              <h3 className="text-[11px] font-semibold text-surface-500 uppercase tracking-wider">Amount by Cost Code</h3>
+            </div>
+            <div className="p-4">
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={chartData} barSize={24}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                  <XAxis dataKey="costCode" tick={{ fill: '#71717a', fontSize: 10 }} axisLine={{ stroke: '#27272a' }} tickLine={false} />
+                  <YAxis tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '3px', fontSize: '12px' }}
+                    labelStyle={{ color: '#e4e4e7' }}
+                    formatter={v => [`$${v.toLocaleString()}`, 'Amount']}
+                  />
+                  <Bar dataKey="totalAmount" name="Amount ($)" fill="#2563eb" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
 
         {/* Running Totals */}
-        <div className="bg-surface-900 border border-surface-800 rounded-xl overflow-hidden">
-          <div className="px-5 py-3 border-b border-surface-800">
-            <h3 className="text-sm font-medium text-surface-300">Running Totals by Cost Code</h3>
+        <div className="bg-surface-900 border border-surface-800 rounded-[4px] overflow-hidden">
+          <div className="px-4 py-3 border-b border-surface-800">
+            <h3 className="text-[11px] font-semibold text-surface-500 uppercase tracking-wider">Running Totals</h3>
           </div>
           <DataTable columns={columns} data={runningTotals} compact emptyMessage="No invoice data. Create invoices to build billing history." />
         </div>
 
         {/* Detailed History */}
-        <div className="bg-surface-900 border border-surface-800 rounded-xl overflow-hidden">
-          <div className="px-5 py-3 border-b border-surface-800">
-            <h3 className="text-sm font-medium text-surface-300">Detailed Invoice Line Items</h3>
+        <div className="bg-surface-900 border border-surface-800 rounded-[4px] overflow-hidden">
+          <div className="px-4 py-3 border-b border-surface-800">
+            <h3 className="text-[11px] font-semibold text-surface-500 uppercase tracking-wider">Line Item Detail</h3>
           </div>
           <DataTable columns={detailColumns} data={historyData} compact pageSize={20} emptyMessage="No line item data" />
         </div>
